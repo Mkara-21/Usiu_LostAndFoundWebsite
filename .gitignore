@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+
+# Local databases
+*.db
+*.sqlite3
+
+# Environment variables and secrets
+.env
+
+# User-uploaded images
+static/uploads/*
+
+# Keep the uploads folder
+!static/uploads/.gitkeep
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
