@@ -12,10 +12,8 @@ This feature branch contains the Flask application for the USIU Lost and Found S
 - Session management
 - Image upload for found items
 
-## Files
+## File
 - usiulostnfound_app.py - Main Flask application.
-- usiulostnfound_database.py - Database setup and connection.
-- LostandFound_Usecase.png - Use case diagram.
 
 ## Author
 MelatDB
