@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}USIU-A Lost & Found{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='usiulostnfound.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-brand">USIU-A Lost & Found Portal</div>
+        {% if session.get('role') %}
+        <div class="navbar-user">{{ session.get('user_name', 'User') }}</div>
+        {% endif %}
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <script src="{{ url_for('static', filename='usiulostnfound.js') }}"></script>
+</body>
+</html>

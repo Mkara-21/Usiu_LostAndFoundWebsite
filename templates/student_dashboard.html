@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Student dashboard | USIU-A Lost & Found{% endblock %}
+{% block content %}
+<h1>Student operations</h1>
+<p>Report a recovered item or search the campus recovery register.</p>
+<div class="action-container">
+    {% include "partials/finder_form.html" %}
+    {% include "partials/claim_form.html" %}
+</div>
+{% include "partials/item_list.html" %}
+{% endblock %}
