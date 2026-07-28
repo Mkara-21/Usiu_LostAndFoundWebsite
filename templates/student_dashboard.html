@@ -1,11 +1,76 @@
 {% extends "base.html" %}
-{% block title %}Student dashboard | USIU-A Lost & Found{% endblock %}
+{% block title %}Student workspace | USIU-A Lost & Found{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 {% block content %}
-<h1>Student operations</h1>
-<p>Report a recovered item or search the campus recovery register.</p>
-<div class="action-container">
-    {% include "partials/finder_form.html" %}
-    {% include "partials/claim_form.html" %}
+<div class="dashboard-shell" data-open-panel="{{ request.args.get('panel', '') }}">
+    <section class="dashboard-hero">
+        <div>
+            <span class="eyebrow eyebrow-light">Student operations</span>
+            <h1>Help an item find its way home.</h1>
+            <p>Report what you found, or search verified campus recovery records.</p>
+        </div>
+        <div class="hero-actions">
+            <button type="button" class="button button-light" onclick="showSection('finder-section')">
+                <span aria-hidden="true">＋</span> Report a found item
+            </button>
+            <button type="button" class="button button-gold" onclick="showSection('owner-section')">
+                <span aria-hidden="true">⌕</span> Find my item
+            </button>
+        </div>
+    </section>
+
+    <section class="metric-grid" aria-label="Recovery summary">
+        <article class="metric-card">
+            <span class="metric-icon" aria-hidden="true">◎</span>
+            <div><strong>{{ item_count }}</strong><span>Available records</span></div>
+        </article>
+        <article class="metric-card">
+            <span class="metric-icon metric-icon-gold" aria-hidden="true">✓</span>
+            <div><strong>{{ checked_in_count }}</strong><span>Verified by security</span></div>
+        </article>
+        <article class="metric-card metric-message">
+            <span class="metric-icon metric-icon-soft" aria-hidden="true">i</span>
+            <div><strong>Keep proof private</strong><span>Identifiers are visible only to security.</span></div>
+        </article>
+    </section>
+
+    <section class="workspace-panel form-panel" id="finder-section" hidden>
+        <div class="section-heading">
+            <div><span class="eyebrow">Finder report</span><h2>Record a recovered item</h2></div>
+            <button type="button" class="icon-button" aria-label="Close finder form" onclick="hideSection('finder-section')">×</button>
+        </div>
+        {% include "partials/finder_form.html" %}
+    </section>
+
+    <section class="workspace-panel form-panel form-panel-gold" id="owner-section" hidden>
+        <div class="section-heading">
+            <div><span class="eyebrow">Ownership claim</span><h2>Tell security what only the owner would know</h2></div>
+            <button type="button" class="icon-button" aria-label="Close ownership form" onclick="hideSection('owner-section')">×</button>
+        </div>
+        {% include "partials/claim_form.html" %}
+    </section>
+
+    <section class="workspace-panel">
+        <div class="section-heading recovery-heading">
+            <div>
+                <span class="eyebrow">Live recovery register</span>
+                <h2>Items currently available</h2>
+                <p>Browse public details. Private identifiers remain protected.</p>
+            </div>
+            <label class="search-field" for="item-search">
+                <span aria-hidden="true">⌕</span>
+                <input id="item-search" type="search" placeholder="Search description or location" oninput="filterItems(this.value)">
+            </label>
+        </div>
+
+        <div class="filter-row" aria-label="Filter items by category">
+            <button type="button" class="filter-chip active" data-filter="All" onclick="filterCategory('All', this)">All items</button>
+            {% for category in categories %}
+            <button type="button" class="filter-chip" data-filter="{{ category }}" onclick="filterCategory('{{ category }}', this)">{{ category }}</button>
+            {% endfor %}
+        </div>
+
+        {% include "partials/item_list.html" %}
+    </section>
 </div>
-{% include "partials/item_list.html" %}
 {% endblock %}

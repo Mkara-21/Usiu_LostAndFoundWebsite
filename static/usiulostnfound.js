@@ -1,110 +1,145 @@
 function showSection(sectionId) {
-    // Hide both forms first
-    document.getElementById('finder-section').style.display = 'none';
-    document.getElementById('owner-section').style.display = 'none';
-    
-    // Show the selected form cleanly
-    document.getElementById(sectionId).style.display = 'block';
-    
-    // Smooth scroll down to the active form area
-    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    ["finder-section", "owner-section"].forEach((id) => {
+        const section = document.getElementById(id);
+        if (section) section.hidden = id !== sectionId;
+    });
+
+    const selected = document.getElementById(sectionId);
+    if (selected) {
+        selected.scrollIntoView({ behavior: "smooth", block: "start" });
+        const firstField = selected.querySelector("input:not([type='hidden']), select, textarea");
+        if (firstField) firstField.focus({ preventScroll: true });
+    }
 }
 
-function filterCategory(categoryName) {
-    // Grab all the item rows in the table
-    const rows = document.querySelectorAll('.item-row');
-    
-    rows.forEach(row => {
-        // If 'All' is clicked, show everything. Otherwise, match the category attribute
-        if (categoryName === 'All' || row.getAttribute('data-category') === categoryName) {
-            row.style.display = ''; // Shows the row
-        } else {
-            row.style.display = 'none'; // Hides the row
+function hideSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) section.hidden = true;
+}
+
+function startClaim(button) {
+    const itemId = button.dataset.itemId;
+    const description = button.dataset.itemDesc;
+    const idField = document.getElementById("claim-item-id");
+    const nameField = document.getElementById("claim-item-name");
+    if (!idField || !nameField || !itemId || !description) return;
+
+    idField.value = itemId;
+    nameField.value = description;
+    showSection("owner-section");
+}
+
+function filterCategory(categoryName, activeButton) {
+    const rows = document.querySelectorAll(".item-card");
+    let visibleCount = 0;
+
+    rows.forEach((row) => {
+        const categoryMatches =
+            categoryName === "All" || row.dataset.category === categoryName;
+        const searchMatches = row.dataset.searchMatch !== "false";
+        row.hidden = !(categoryMatches && searchMatches);
+        if (!row.hidden) visibleCount += 1;
+    });
+
+    document.querySelectorAll(".filter-chip").forEach((button) => {
+        button.classList.toggle("active", button === activeButton);
+    });
+    const empty = document.getElementById("filtered-empty");
+    if (empty) empty.hidden = visibleCount !== 0;
+}
+
+function filterItems(searchTerm) {
+    const normalized = searchTerm.trim().toLowerCase();
+    const active = document.querySelector(".filter-chip.active");
+    const category = active ? active.dataset.filter : "All";
+
+    document.querySelectorAll(".item-card").forEach((card) => {
+        card.dataset.searchMatch = String(
+            !normalized || card.dataset.search.toLowerCase().includes(normalized)
+        );
+    });
+    filterCategory(category, active);
+}
+
+function switchGatewayForm(showId, hideId) {
+    const show = document.getElementById(showId);
+    const hide = document.getElementById(hideId);
+    if (hide) hide.hidden = true;
+    if (show) {
+        show.hidden = false;
+        const firstField = show.querySelector("input, select");
+        if (firstField) firstField.focus();
+    }
+}
+
+function togglePasswordVisibility(inputId, button) {
+    const field = document.getElementById(inputId);
+    if (!field) return;
+    const showing = field.type === "text";
+    field.type = showing ? "password" : "text";
+    if (button) {
+        button.textContent = showing ? "Show" : "Hide";
+        button.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    }
+}
+
+function adjustIDPlaceholder(roleSelectId, inputId) {
+    const roleSelect = document.getElementById(roleSelectId);
+    const input = document.getElementById(inputId);
+    if (!roleSelect || !input) return;
+
+    const security = roleSelect.value === "security";
+    input.placeholder = security
+        ? "Enter 9-digit Security Badge ID"
+        : "Enter 6-digit Student ID";
+    input.pattern = security ? "\\d{9}" : "\\d{6}";
+    input.maxLength = security ? 9 : 6;
+}
+
+function toggleAdminDetails(dossierId, button) {
+    const row = document.getElementById(dossierId);
+    if (!row) return;
+    row.hidden = !row.hidden;
+    if (button) {
+        button.setAttribute("aria-expanded", String(!row.hidden));
+        button.textContent = row.hidden ? "Open dossier" : "Close dossier";
+    }
+}
+
+function filterTableRows(tableId, selectedStatus) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    table.querySelectorAll("tr.registry-row").forEach((row) => {
+        const show = selectedStatus === "All" || row.dataset.status === selectedStatus;
+        row.hidden = !show;
+        const dossier = row.nextElementSibling;
+        if (!show && dossier && dossier.classList.contains("dossier-row")) {
+            dossier.hidden = true;
+            const button = row.querySelector("[aria-expanded]");
+            if (button) {
+                button.setAttribute("aria-expanded", "false");
+                button.textContent = "Open dossier";
+            }
         }
     });
 }
 
-function toggleAdminDetails(itemId) {
-    const detailsDiv = document.getElementById('details-' + itemId);
-    if (detailsDiv.style.display === 'none' || !detailsDiv.style.display) {
-        detailsDiv.style.display = 'block';
-    } else {
-        detailsDiv.style.display = 'none';
+document.addEventListener("DOMContentLoaded", () => {
+    const authLayout = document.querySelector(".auth-layout");
+    if (authLayout && authLayout.dataset.authMode === "signup") {
+        switchGatewayForm("signup-box", "login-box");
     }
-}
 
-// Switches visibility between the Login and Sign-Up boxes
-function switchGatewayForm(showId, hideId) {
-    document.getElementById(hideId).style.display = 'none';
-    document.getElementById(showId).style.display = 'block';
-}
-
-// Flips password inputs between dot symbols and readable text
-function togglePasswordVisibility(inputId) {
-    const field = document.getElementById(inputId);
-    if (field.type === 'password') {
-        field.type = 'text';
-    } else {
-        field.type = 'password';
+    const dashboard = document.querySelector(".dashboard-shell[data-open-panel]");
+    if (dashboard && dashboard.dataset.openPanel) {
+        const panelId = dashboard.dataset.openPanel === "owner"
+            ? "owner-section"
+            : "finder-section";
+        showSection(panelId);
     }
-}
 
-// Changes placeholders dynamically based on selected user roles
-function adjustIDPlaceholder(roleSelectId, inputId) {
-    const selection = document.getElementById(roleSelectId).value;
-    const inputField = document.getElementById(inputId);
-    
-    if (selection === 'security') {
-        inputField.placeholder = "Enter 9-digit Officer Badge ID";
-        inputField.removeAttribute('pattern');
-    } else {
-        inputField.placeholder = "Enter 6-digit ID";
-        inputField.setAttribute('pattern', '\\d{6}');
-    }
-}
-
-// Status Filter (Pending, Reviewed, Dismissed) for Security Tables
-function filterTableRows(tableId, selectedStatus) {
-    const table = document.getElementById(tableId);
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-    
-    for (let i = 0; i < rows.length; i++) {
-        // Skip details/dossier sliding panels during status screening
-        if (rows[i].id && rows[i].id.includes('dossier')) continue;
-        
-        const status = rows[i].getAttribute('data-status');
-        if (selectedStatus === "All" || status === selectedStatus) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-            // Also hide accompanying dossier drawer if it was open
-            const nextRow = rows[i].nextElementSibling;
-            if (nextRow && nextRow.id && nextRow.id.includes('dossier')) {
-                nextRow.style.display = "none";
-            }
-        }
-    }
-}
-
-// Category Filter for Master Recorded Registry
-function filterRegistryCategory(selectedCategory) {
-    const rows = document.getElementsByClassName('registry-row');
-    for (let i = 0; i < rows.length; i++) {
-        const cat = rows[i].getAttribute('data-category');
-        if (selectedCategory === "All" || cat === selectedCategory) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-        }
-    }
-}
-
-// Dossier Accordion Slider Toggle
-function toggleAdminDetails(id) {
-    const detailRow = document.getElementById(id);
-    if (detailRow.style.display === "none") {
-        detailRow.style.display = "table-row";
-    } else {
-        detailRow.style.display = "none";
-    }
-}
+    ["login-role", "reg-role"].forEach((roleId) => {
+        const role = document.getElementById(roleId);
+        if (role) adjustIDPlaceholder(roleId, roleId === "login-role" ? "login-id" : "reg-id");
+    });
+});

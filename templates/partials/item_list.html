@@ -1,4 +1,36 @@
-<section class="card">
-    <h2>Available items</h2>
-    <p>The searchable item register will be implemented in its assigned feature branch.</p>
-</section>
+<div class="item-grid" id="item-grid">
+    {% for item in items %}
+    <article class="item-card" data-category="{{ item.category }}" data-search="{{ item.description }} {{ item.location }}">
+        <div class="item-image">
+            {% if item.image_path %}
+            <img src="{{ url_for('static', filename=item.image_path) }}" alt="Photograph of {{ item.description }}">
+            {% else %}
+            <span aria-hidden="true">{{ item.category[0] }}</span>
+            {% endif %}
+            <span class="status-pill status-{{ item.status | lower | replace(' ', '-') }}">{{ item.status }}</span>
+        </div>
+        <div class="item-body">
+            <span class="item-category">{{ item.category }}</span>
+            <h3>{{ item.description }}</h3>
+            <dl class="item-meta">
+                <div><dt>Location</dt><dd>{{ item.location }}</dd></div>
+                <div><dt>Date found</dt><dd>{{ item.date }}</dd></div>
+            </dl>
+            <button type="button" class="button button-outline button-full"
+                    data-item-id="{{ item.id }}" data-item-desc="{{ item.description }}"
+                    onclick="startClaim(this)">This may be mine</button>
+        </div>
+    </article>
+    {% else %}
+    <div class="empty-state">
+        <span aria-hidden="true">⌕</span>
+        <h3>No available items yet</h3>
+        <p>Try another category later or report an item you have found.</p>
+    </div>
+    {% endfor %}
+</div>
+<div class="empty-state" id="filtered-empty" hidden>
+    <span aria-hidden="true">⌕</span>
+    <h3>No matching items</h3>
+    <p>Clear the search or select another category.</p>
+</div>
