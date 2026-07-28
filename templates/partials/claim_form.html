@@ -1,4 +1,20 @@
-<section class="action-card owner-card">
-    <h2>Submit an ownership claim</h2>
-    <p>The claim form will be implemented in its assigned feature branch.</p>
-</section>
+<form action="{{ url_for('claims.submit_claim') }}" method="post" class="form-grid">
+    <input type="hidden" name="item_id" id="claim-item-id">
+    <div class="field field-wide">
+        <label for="claim-item-name">Selected item</label>
+        <input id="claim-item-name" name="claimed_item" placeholder="Choose an item from the recovery register below" readonly required>
+    </div>
+    <div class="field field-wide">
+        <label for="proof-identifier">Private proof of ownership</label>
+        <textarea id="proof-identifier" name="proof_identifier" rows="4" placeholder="Describe a serial number, hidden mark, contents, engraving, lock screen, or another detail only the owner knows." required></textarea>
+        <small>Security compares this evidence with the finder’s protected identifier.</small>
+    </div>
+    <div class="field field-wide">
+        <label for="owner-contact">Contact information</label>
+        <input id="owner-contact" name="owner_contact" placeholder="Phone number or USIU email" required>
+    </div>
+    <div class="form-actions field-wide">
+        <button type="button" class="button button-secondary" onclick="hideSection('owner-section')">Cancel</button>
+        <button type="submit" class="button button-gold">Submit ownership claim</button>
+    </div>
+</form>
