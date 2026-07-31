@@ -342,6 +342,10 @@ button[disabled] {
     grid-template-columns: minmax(380px, 0.95fr) minmax(460px, 1.05fr);
 }
 
+.auth-layout > * {
+    min-width: 0;
+}
+
 .auth-story {
     position: relative;
     display: flex;
@@ -375,6 +379,10 @@ button[disabled] {
     z-index: 2;
 }
 
+.auth-story-content {
+    min-width: 0;
+}
+
 .auth-story h1 {
     max-width: 680px;
     margin: 0;
@@ -395,12 +403,13 @@ button[disabled] {
     margin: 26px 0 36px;
     color: #c8d7e7;
     font-size: 1.05rem;
+    overflow-wrap: anywhere;
 }
 
 .auth-proof {
     display: grid;
     max-width: 620px;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -1148,12 +1157,12 @@ td small {
     }
 
     .auth-proof {
-        gap: 10px;
+        grid-template-columns: 1fr;
     }
 
     .auth-proof div {
         min-width: 0;
-        padding-right: 4px;
+        padding-right: 0;
     }
 
     .auth-proof span {
