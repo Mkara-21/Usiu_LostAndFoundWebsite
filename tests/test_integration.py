@@ -17,7 +17,6 @@ def test_complete_finder_owner_security_workflow(app, client, add_user):
         password="Student@123",
     )
 
-    # Finder reports an item.
     client.post(
         "/login",
         data={
@@ -47,7 +46,6 @@ def test_complete_finder_owner_security_workflow(app, client, add_user):
     finally:
         connection.close()
 
-    # Security checks the item in.
     client.post(
         "/login",
         data={
@@ -59,7 +57,6 @@ def test_complete_finder_owner_security_workflow(app, client, add_user):
     client.post(f"/security/items/{item_id}/checkin")
     client.get("/logout")
 
-    # A different student submits private ownership evidence.
     client.post(
         "/login",
         data={
@@ -87,7 +84,6 @@ def test_complete_finder_owner_security_workflow(app, client, add_user):
     finally:
         connection.close()
 
-    # Security approves and records the return.
     client.post(
         "/login",
         data={

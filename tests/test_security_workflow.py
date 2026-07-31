@@ -1,9 +1,7 @@
 """Security state-transition tests."""
 
 
-def test_security_checks_in_pending_item(
-    client, login_as, add_item, database
-):
+def test_security_checks_in_pending_item(client, login_as, add_item, database):
     item_id = add_item("Pending Security")
     login_as("security", "123456789", "Security Officer")
     response = client.post(f"/security/items/{item_id}/checkin")
