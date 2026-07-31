@@ -2,9 +2,7 @@
 {% block title %}Security console | USIU-A Lost & Found{% endblock %}
 {% block body_class %}dashboard-page security-page{% endblock %}
 {% block content %}
-{% set preview_view = request.args.get("view", "") if config.get("VISUAL_PREVIEW") else "" %}
 <div class="dashboard-shell">
-    {% if not preview_view %}
     <section class="dashboard-hero security-hero">
         <div>
             <span class="eyebrow eyebrow-light">Authorized operations</span>
@@ -20,9 +18,7 @@
         <article class="metric-card"><span class="metric-icon metric-icon-soft">?</span><div><strong>{{ metrics.pending_claims }}</strong><span>Claims to review</span></div></article>
         <article class="metric-card"><span class="metric-icon metric-icon-green">↗</span><div><strong>{{ metrics.returned }}</strong><span>Returned items</span></div></article>
     </section>
-    {% endif %}
 
-    {% if preview_view != "claims" %}
     <section class="workspace-panel">
         <div class="section-heading">
             <div><span class="eyebrow">Item custody</span><h2>Recovered-item register</h2><p>Open a dossier to view private verification details.</p></div>
@@ -48,8 +44,7 @@
                         <td><span class="status-pill status-{{ item.status | lower | replace(' ', '-') }}">{{ item.status }}</span></td>
                         <td><button type="button" class="button button-outline button-small" aria-expanded="false" aria-controls="dossier-{{ item.id }}" onclick="toggleAdminDetails('dossier-{{ item.id }}', this)">Open dossier</button></td>
                     </tr>
-                    {% set preview_dossier = preview_view == "dossier" and request.args.get("dossier") == item.id|string %}
-                    <tr class="dossier-row" id="dossier-{{ item.id }}" {% if not preview_dossier %}hidden{% endif %}>
+                    <tr class="dossier-row" id="dossier-{{ item.id }}" hidden>
                         <td colspan="5">
                             <div class="dossier">
                                 <div class="dossier-image">
@@ -85,9 +80,7 @@
             </table>
         </div>
     </section>
-    {% endif %}
 
-    {% if preview_view != "dossier" %}
     <section class="workspace-panel">
         <div class="section-heading">
             <div><span class="eyebrow">Ownership verification</span><h2>Claim review queue</h2><p>Compare submitted proof with the protected finder record.</p></div>
@@ -126,6 +119,5 @@
             </table>
         </div>
     </section>
-    {% endif %}
 </div>
 {% endblock %}

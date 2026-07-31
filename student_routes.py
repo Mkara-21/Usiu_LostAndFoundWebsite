@@ -35,16 +35,10 @@ PUBLIC_ITEM_COLUMNS = """
 
 
 def _database_connection():
-    """Open the configured database, including future path-aware implementations."""
+    """Open the configured application database."""
     database_path = current_app.config.get("DATABASE_PATH")
     if database_path:
-        try:
-            return get_connection(database_path)
-        except TypeError:
-            # The current baseline owns a no-argument database helper. Member 3's
-            # handoff adds configurable paths; supporting both keeps this branch
-            # independently usable without changing that member's file.
-            pass
+        return get_connection(database_path)
     return get_connection()
 
 

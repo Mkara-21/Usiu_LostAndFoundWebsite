@@ -44,7 +44,6 @@ seed_mockdata.py                Demonstration accounts and records
 templates/                      Modular Jinja interfaces
 static/                         CSS, JavaScript, and runtime uploads
 tests/                          Unit, template, and integration tests
-scripts/visual_preview.py       Local authenticated screenshot helper
 ```
 
 ## Local setup

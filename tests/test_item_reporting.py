@@ -21,12 +21,12 @@ VALID_ITEM = {
 
 @pytest.fixture()
 def app(tmp_path, monkeypatch):
-    database_path = tmp_path / "member_05.db"
+    database_path = tmp_path / "item-reporting.db"
     monkeypatch.setattr(database_module, "DATABASE_PATH", database_path)
     return create_app(
         {
             "TESTING": True,
-            "SECRET_KEY": "member-05-test-secret",
+            "SECRET_KEY": "item-reporting-test-secret",
             "DATABASE_PATH": str(database_path),
             "UPLOAD_FOLDER": str(tmp_path / "uploads"),
         }
