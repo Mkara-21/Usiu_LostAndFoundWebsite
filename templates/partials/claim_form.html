@@ -1,8 +1,8 @@
 <form action="{{ url_for('claims.submit_claim') }}" method="post" class="form-grid">
-    <input type="hidden" name="item_id" id="claim-item-id">
+    <input type="hidden" name="item_id" id="claim-item-id" value="{{ request.args.get('item_id', '') }}">
     <div class="field field-wide">
         <label for="claim-item-name">Selected item</label>
-        <input id="claim-item-name" name="claimed_item" placeholder="Choose an item from the recovery register below" readonly required>
+        <input id="claim-item-name" name="claimed_item" value="{{ request.args.get('item', '') }}" placeholder="Choose an item from the recovery register below" readonly required>
     </div>
     <div class="field field-wide">
         <label for="proof-identifier">Private proof of ownership</label>

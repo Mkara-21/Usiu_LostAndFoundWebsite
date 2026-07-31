@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import secrets
 
 from flask import Flask, redirect, session, url_for
 
@@ -19,16 +20,19 @@ def create_app(test_config=None):
     """Create and configure a Flask application instance."""
     app = Flask(__name__, template_folder="templates", static_folder="static")
     app.config.from_mapping(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-me"),
+        SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
+        DATABASE_PATH=str(BASE_DIR / "lostandfound.db"),
         MAX_CONTENT_LENGTH=5 * 1024 * 1024,
         UPLOAD_FOLDER=str(BASE_DIR / "static" / "uploads"),
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
     )
 
     if test_config:
         app.config.update(test_config)
 
     Path(app.config["UPLOAD_FOLDER"]).mkdir(parents=True, exist_ok=True)
-    init_db()
+    init_db(app.config["DATABASE_PATH"])
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(student_bp)
@@ -43,6 +47,13 @@ def create_app(test_config=None):
         if role == "security":
             return redirect(url_for("security.dashboard"))
         return redirect(url_for("auth.authentication"))
+
+    @app.errorhandler(413)
+    def upload_too_large(_error):
+        from flask import flash
+
+        flash("The uploaded file is larger than the 5 MB limit.", "error")
+        return redirect(url_for("student.dashboard", panel="finder"))
 
     return app
 
