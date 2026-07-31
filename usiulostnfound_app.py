@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import secrets
 
 from flask import Flask, redirect, session, url_for
 
@@ -19,7 +20,7 @@ def create_app(test_config=None):
     """Create and configure a Flask application instance."""
     app = Flask(__name__, template_folder="templates", static_folder="static")
     app.config.from_mapping(
-        SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-change-me"),
+        SECRET_KEY=os.environ.get("SECRET_KEY") or secrets.token_hex(32),
         DATABASE_PATH=str(BASE_DIR / "lostandfound.db"),
         MAX_CONTENT_LENGTH=5 * 1024 * 1024,
         UPLOAD_FOLDER=str(BASE_DIR / "static" / "uploads"),

@@ -13,6 +13,15 @@ def test_home_redirects_guests_to_authentication():
     assert response.headers["Location"].endswith("/auth")
 
 
+def test_default_session_key_is_random(monkeypatch, tmp_path):
+    monkeypatch.delenv("SECRET_KEY", raising=False)
+    first_app = create_app({"DATABASE_PATH": str(tmp_path / "first.db")})
+    second_app = create_app({"DATABASE_PATH": str(tmp_path / "second.db")})
+
+    assert len(first_app.config["SECRET_KEY"]) == 64
+    assert first_app.config["SECRET_KEY"] != second_app.config["SECRET_KEY"]
+
+
 def test_authentication_page_loads_static_assets():
     app = create_app({"TESTING": True, "SECRET_KEY": "test-secret"})
 
