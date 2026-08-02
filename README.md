@@ -1,4 +1,4 @@
-# Feature Branch: Lost and Found Application
+﻿# Feature Branch: Lost and Found Application
 
 ## Description
 This feature branch contains the main Flask application for the USIU Lost and Found System. It implements the backend logic for user authentication, item reporting, claim processing, and security officer workflows.
@@ -17,7 +17,7 @@ This feature branch contains the main Flask application for the USIU Lost and Fo
 - USIU email and user ID validation
 
 ## File
-- `usiulostnfound_app.py` – Main Flask application containing routes and application logic.
+- `usiulostnfound_app.py` ΓÇô Main Flask application containing routes and application logic.
 
 ## Technologies Used
 - Python

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Security console | USIU-A Lost & Found{% endblock %}
+{% block body_class %}dashboard-page security-page{% endblock %}
+{% block content %}
+<div class="dashboard-shell">
+    <section class="dashboard-hero security-hero">
+        <div>
+            <span class="eyebrow eyebrow-light">Authorized operations</span>
+            <h1>Security verification console</h1>
+            <p>Check items into secure storage, evaluate ownership evidence, and confirm responsible returns.</p>
+        </div>
+        <span class="secure-badge"><span aria-hidden="true">◆</span> Secure desk</span>
+    </section>
+
+    <section class="metric-grid metric-grid-four" aria-label="Security workflow summary">
+        <article class="metric-card"><span class="metric-icon">!</span><div><strong>{{ metrics.pending_items }}</strong><span>Awaiting check-in</span></div></article>
+        <article class="metric-card"><span class="metric-icon metric-icon-gold">✓</span><div><strong>{{ metrics.checked_in }}</strong><span>In secure storage</span></div></article>
+        <article class="metric-card"><span class="metric-icon metric-icon-soft">?</span><div><strong>{{ metrics.pending_claims }}</strong><span>Claims to review</span></div></article>
+        <article class="metric-card"><span class="metric-icon metric-icon-green">↗</span><div><strong>{{ metrics.returned }}</strong><span>Returned items</span></div></article>
+    </section>
+
+    <section class="workspace-panel">
+        <div class="section-heading">
+            <div><span class="eyebrow">Item custody</span><h2>Recovered-item register</h2><p>Open a dossier to view private verification details.</p></div>
+            <label class="select-filter" for="security-item-filter">
+                <span>Status</span>
+                <select id="security-item-filter" onchange="filterTableRows('security-items', this.value)">
+                    <option value="All">All statuses</option>
+                    <option value="Pending Security">Pending Security</option>
+                    <option value="Checked-In">Checked-In</option>
+                    <option value="Claimed">Claimed</option>
+                </select>
+            </label>
+        </div>
+        <div class="table-wrap">
+            <table id="security-items">
+                <thead><tr><th>Item</th><th>Found at</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr class="registry-row" data-status="{{ item.status }}">
+                        <td><strong>{{ item.description }}</strong><small>{{ item.category }}</small></td>
+                        <td>{{ item.location }}</td>
+                        <td>{{ item.date }}</td>
+                        <td><span class="status-pill status-{{ item.status | lower | replace(' ', '-') }}">{{ item.status }}</span></td>
+                        <td><button type="button" class="button button-outline button-small" aria-expanded="false" aria-controls="dossier-{{ item.id }}" onclick="toggleAdminDetails('dossier-{{ item.id }}', this)">Open dossier</button></td>
+                    </tr>
+                    <tr class="dossier-row" id="dossier-{{ item.id }}" hidden>
+                        <td colspan="5">
+                            <div class="dossier">
+                                <div class="dossier-image">
+                                    {% if item.image_path %}
+                                    <img src="{{ url_for('static', filename=item.image_path) }}" alt="Photograph of {{ item.description }}">
+                                    {% else %}<span aria-hidden="true">{{ item.category[0] }}</span>{% endif %}
+                                </div>
+                                <dl>
+                                    <div><dt>Private identifier</dt><dd>{{ item.identifier }}</dd></div>
+                                    <div><dt>Finder contact</dt><dd>{{ item.contact }}</dd></div>
+                                    <div><dt>Recorded</dt><dd>{{ item.created_at }}</dd></div>
+                                </dl>
+                                <div class="dossier-actions">
+                                    {% if item.status == "Pending Security" %}
+                                    <form action="{{ url_for('security.check_in_item', item_id=item.id) }}" method="post">
+                                        <button class="button button-primary" type="submit">Confirm secure check-in</button>
+                                    </form>
+                                    {% elif item.status == "Claimed" %}
+                                    <form action="{{ url_for('security.confirm_return', item_id=item.id) }}" method="post">
+                                        <button class="button button-secondary" type="submit">Confirm return record</button>
+                                    </form>
+                                    {% else %}
+                                    <span class="muted">Item is secured and ready for verified claim review.</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5"><div class="table-empty">No recovered items have been recorded.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="workspace-panel">
+        <div class="section-heading">
+            <div><span class="eyebrow">Ownership verification</span><h2>Claim review queue</h2><p>Compare submitted proof with the protected finder record.</p></div>
+        </div>
+        <div class="table-wrap">
+            <table id="security-claims">
+                <thead><tr><th>Claimed item</th><th>Owner evidence</th><th>Contact</th><th>Status</th><th>Decision</th></tr></thead>
+                <tbody>
+                    {% for claim in claims %}
+                    <tr data-status="{{ claim.status }}">
+                        <td><strong>{{ claim.claimed_item }}</strong><small>Item #{{ claim.item_id }}</small></td>
+                        <td class="evidence-cell">{{ claim.proof_identifier }}</td>
+                        <td>{{ claim.contact }}</td>
+                        <td><span class="status-pill status-{{ claim.status | lower }}">{{ claim.status }}</span></td>
+                        <td>
+                            {% if claim.status == "Pending" %}
+                            <div class="inline-actions">
+                                <form action="{{ url_for('security.decide_claim', claim_id=claim.id) }}" method="post">
+                                    <input type="hidden" name="decision" value="approve">
+                                    <button type="submit" class="button button-success button-small" {% if claim.item_status != "Checked-In" %}disabled title="Check the item in first"{% endif %}>Approve</button>
+                                </form>
+                                <form action="{{ url_for('security.decide_claim', claim_id=claim.id) }}" method="post">
+                                    <input type="hidden" name="decision" value="deny">
+                                    <button type="submit" class="button button-danger button-small">Deny</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="muted">Decision recorded</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5"><div class="table-empty">No ownership claims are waiting for review.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

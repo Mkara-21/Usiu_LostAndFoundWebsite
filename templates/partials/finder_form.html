@@ -1,0 +1,41 @@
+<form action="{{ url_for('student.report_item') }}" method="post" enctype="multipart/form-data" class="form-grid">
+    <div class="field">
+        <label for="item-category">Item category</label>
+        <select id="item-category" name="category" required>
+            <option value="">Choose a category</option>
+            {% for category in categories %}
+            <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="field">
+        <label for="item-description">Visual description</label>
+        <input id="item-description" name="description" placeholder="e.g. Black phone with a clear case" required>
+    </div>
+    <div class="field field-wide">
+        <label for="item-identifier">Private identifier or secret mark</label>
+        <input id="item-identifier" name="identifier" placeholder="Serial number, engraving, sticker, or other hidden detail" required>
+        <small>This information is shown only to security officers.</small>
+    </div>
+    <div class="field">
+        <label for="item-location">Campus location found</label>
+        <input id="item-location" name="location" placeholder="e.g. Library second floor" required>
+    </div>
+    <div class="field">
+        <label for="item-date">Date found</label>
+        <input type="date" id="item-date" name="date" required>
+    </div>
+    <div class="field">
+        <label for="finder-contact">Your contact information</label>
+        <input id="finder-contact" name="finder_contact" placeholder="Phone number or USIU email" required>
+    </div>
+    <div class="field">
+        <label for="item-photo">Item photograph <span class="optional">(optional)</span></label>
+        <input type="file" id="item-photo" name="item_photo" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
+        <small>PNG, JPG, WEBP, or GIF. Maximum 5 MB.</small>
+    </div>
+    <div class="form-actions field-wide">
+        <button type="button" class="button button-secondary" onclick="hideSection('finder-section')">Cancel</button>
+        <button type="submit" class="button button-primary">Submit found-item report</button>
+    </div>
+</form>

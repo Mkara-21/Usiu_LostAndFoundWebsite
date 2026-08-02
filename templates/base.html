@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#062b56">
+    <title>{% block title %}USIU-A Lost & Found{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='usiulostnfound.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    {% if session.get("role") %}
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('home') }}" aria-label="USIU-A Lost and Found home">
+            <span class="brand-mark" aria-hidden="true">LF</span>
+            <span>
+                <strong>USIU-A</strong>
+                <small>Lost &amp; Found</small>
+            </span>
+        </a>
+        <div class="session-area">
+            <div class="session-copy">
+                <span>{{ session.get("role", "") | title }} workspace</span>
+                <strong>{{ session.get("user_name", "Campus user") }}</strong>
+            </div>
+            <a class="button button-ghost button-small" href="{{ url_for('auth.logout') }}">Sign out</a>
+        </div>
+    </header>
+    {% endif %}
+
+    <div class="flash-stack" aria-live="polite" aria-atomic="true">
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="flash flash-{{ category }}" role="status">
+            <span>{{ message }}</span>
+            <button type="button" class="flash-close" aria-label="Dismiss message" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <span>USIU-A Campus Services</span>
+        <span>Secure reporting · Verified claims · Responsible returns</span>
+    </footer>
+
+    <script src="{{ url_for('static', filename='usiulostnfound.js') }}"></script>
+</body>
+</html>
